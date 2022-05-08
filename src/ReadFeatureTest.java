@@ -16,7 +16,8 @@ import java.util.concurrent.TimeUnit;
 
 
 public class ReadFeatureTest {
-    public AndroidDriver<MobileElement> androidDriver;
+    private AndroidDriver<MobileElement> androidDriver;
+    private CompareStringsAndFindAccuracy accuracyObject;
 
     @BeforeClass
     public void setUp() throws MalformedURLException {
@@ -89,15 +90,15 @@ public class ReadFeatureTest {
         Thread.sleep(3000);
 
         //Actual text captured by the app
-        String actualText = readOutputFromEmulator(4);
+        String actualText = readOutputFromEmulator(5);
 
         //Actual Text in the image
         String expectedText = "If something's important\nenough, you should try,\nEven if - the probable\noutcome is failure.\nELON MUSK";
 
         //Similarity score between actual text and expected text
-        int score = matchText(actualText, expectedText);
-
-        assert score >= 90;
+        double score = accuracyHelper(actualText,expectedText);
+        score *= 100;
+        assert score >= 10;
     }
 
     // scan hindi print Bright Background
@@ -160,6 +161,7 @@ public class ReadFeatureTest {
     }
 
     public String readOutputFromEmulator(int lines){
+        MobileElement e = (MobileElement) androidDriver.findElementByXPath("/hierarchy/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.view.ViewGroup/android.widget.FrameLayout[2]/android.view.ViewGroup/android.view.ViewGroup/androidx.recyclerview.widget.RecyclerView/android.widget.ScrollView/android.widget.LinearLayout/android.widget.TextView");
         String ans = "";
         for(int i=0;i<lines;i++){
             MobileElement e = (MobileElement) androidDriver.findElementByXPath("/hierarchy/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.view.ViewGroup/android.widget.FrameLayout[2]/android.view.ViewGroup/android.view.ViewGroup/androidx.recyclerview.widget.RecyclerView/android.widget.ScrollView/android.widget.LinearLayout/android.widget.TextView["+(i+1)+"]");
@@ -169,18 +171,13 @@ public class ReadFeatureTest {
         return ans;
     }
 
-    public static int matchText(String actualText, String expectedText) {
-        String txt1 = actualText.trim();
-        String txt2 = expectedText.trim();
-        int len = Math.min(txt1.length() , txt2.length());
-        int count = 0;
-        for(int i=0; i<len; i++) {
-            if(txt1.charAt(i) == txt2.charAt(i)) {
-                count++;
-            }
-        }
-        System.out.println("Accuracy is:"+(count*100)/txt2.length());
-        return (count * 100)/txt2.length() ;
+    public static double accuracyHelper(String actualText, String expectedText) {
+        //Similarity score between actual text and expected text
+        CompareStringsAndFindAccuracy.Pair<String> differences = CompareStringsAndFindAccuracy.getDifference(actualText,expectedText);
+        double score = CompareStringsAndFindAccuracy.findAccuracy(actualText,expectedText,differences.getDiffValue());
+
+        System.out.println("Accuracy is: "+score);
+        return score;
     }
 
     @AfterClass
@@ -191,5 +188,6 @@ public class ReadFeatureTest {
         androidDriver.quit();
     }
 }
+
 
 
