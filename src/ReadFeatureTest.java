@@ -90,15 +90,15 @@ public class ReadFeatureTest {
         Thread.sleep(3000);
 
         //Actual text captured by the app
-        String actualText = readOutputFromEmulator(5);
+        MobileElement e = (MobileElement) androidDriver.findElementByXPath("/hierarchy/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.view.ViewGroup/android.widget.FrameLayout[2]/android.view.ViewGroup/android.view.ViewGroup/androidx.recyclerview.widget.RecyclerView/android.widget.ScrollView/android.widget.LinearLayout/android.widget.TextView[0]");
+        String actualText = e.getText();
 
         //Actual Text in the image
-        String expectedText = "If something's important\nenough, you should try,\nEven if - the probable\noutcome is failure.\nELON MUSK";
+        String expectedText = "Would you like a different font ? or just a different material ?";
 
         //Similarity score between actual text and expected text
         double score = accuracyHelper(actualText,expectedText);
-        score *= 100;
-        assert score >= 10;
+        assert score >= 60;
     }
 
     // scan hindi print Bright Background
@@ -158,17 +158,6 @@ public class ReadFeatureTest {
 
         assert true;
 
-    }
-
-    public String readOutputFromEmulator(int lines){
-        MobileElement e = (MobileElement) androidDriver.findElementByXPath("/hierarchy/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.view.ViewGroup/android.widget.FrameLayout[2]/android.view.ViewGroup/android.view.ViewGroup/androidx.recyclerview.widget.RecyclerView/android.widget.ScrollView/android.widget.LinearLayout/android.widget.TextView");
-        String ans = "";
-        for(int i=0;i<lines;i++){
-            MobileElement e = (MobileElement) androidDriver.findElementByXPath("/hierarchy/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.view.ViewGroup/android.widget.FrameLayout[2]/android.view.ViewGroup/android.view.ViewGroup/androidx.recyclerview.widget.RecyclerView/android.widget.ScrollView/android.widget.LinearLayout/android.widget.TextView["+(i+1)+"]");
-            ans+=e.getText();
-            ans+="\n";
-        }
-        return ans;
     }
 
     public static double accuracyHelper(String actualText, String expectedText) {
